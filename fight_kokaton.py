@@ -27,6 +27,10 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+
+
+
+
 class Bird:
 
     """
@@ -175,7 +179,15 @@ class Score:
         screen.blit(self.img,self.rct)
 
 
+def timer(screen: pg.display,timer):
 
+    """
+    ゲームの進行時間を計測し表示する関数
+    """
+
+    font = pg.font.Font(None, 80)  #フォント取得
+    timer = font.render(f"time={timer}", True, (0, 0, 0))  #時間を取得し文字に変換
+    screen.blit(timer, [0, 0])  #screenに貼り付ける
 
 
 def main():
@@ -184,7 +196,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     bombs = [Bomb((255,0,0),10) for i in range(NUM_OF_BOMBS)]
-    beam = None
+    beams:list[Beam] = list()
     clock = pg.time.Clock()
     tmr = 0
     score = Score()
@@ -194,8 +206,8 @@ def main():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                # スペースキー押下でBeamクラスのインスタンス生成        
+                beams.append(Beam(bird))
         screen.blit(bg_img, [0, 0])
         
         for bomb in bombs:
@@ -211,23 +223,29 @@ def main():
             
         
         for j,bomb in enumerate(bombs):
-            if beam is not None:
+            for k,beam in enumerate(beams):
                 if beam.rct.colliderect(bomb.rct):  
                     # ビームと爆弾が衝突したら
-                    beam, bombs[j] = None, None
+                    beams[k], bombs[j] = None, None
                     bird.change_img(6, screen)
                     score.score += 1
                     pg.display.update()
-
+            beams = [beam for beam in beams if beam is not None]
         bombs = [bomb for bomb in bombs if bomb is not None]
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
-        if beam is not None:
-            beam.update(screen)
         for bomb in bombs:
             bomb.update(screen)
-        score.update(screen)
+        for i, beam in enumerate(beams):
+            if check_bound(beam.rct) != (True,True):
+                del beams[i]
+            else:
+                beam.update(screen)
+    
+        score.update(screen)  #スコア更新
+
+        timer(screen,tmr)  #逃げ切っている時間表示
         pg.display.update() 
         tmr += 1
         clock.tick(50)
