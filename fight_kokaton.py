@@ -8,6 +8,7 @@ import pygame as pg
 WIDTH = 1100     # ゲームウィンドウの幅
 HEIGHT = 650     # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 5 # 爆弾の個数
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -133,15 +134,19 @@ class Beam:
 
 
 class Bomb:
+
     """
     爆弾に関するクラス
     """
+
     def __init__(self, color: tuple[int, int, int], rad: int):  #  爆弾 イニシャライザ
+
         """
         引数に基づき爆弾円Surfaceを生成する
         引数1 color：爆弾円の色タプル
         引数2 rad：爆弾円の半径
         """
+
         self.img = pg.Surface((2*rad, 2*rad))
         pg.draw.circle(self.img, color, (rad, rad), rad)
         self.img.set_colorkey((0, 0, 0))
@@ -150,10 +155,12 @@ class Bomb:
         self.vx, self.vy = +5, +5
 
     def update(self, screen: pg.Surface):  #  画面の更新
+
         """
         爆弾を速度ベクトルself.vx, self.vyに基づき移動させる
         引数 screen：画面Surface
         """
+
         yoko, tate = check_bound(self.rct)
         if not yoko:
             self.vx *= -1
@@ -166,6 +173,7 @@ class Bomb:
 
 
 class Score:
+
     def __init__(self):  #score  イニシャライザ
         self.fonto  = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
         self.color  = (0, 0, 255)
@@ -220,7 +228,6 @@ def main():
                 pg.display.update()
                 time.sleep(5)
                 return
-            
         
         for j,bomb in enumerate(bombs):
             for k,beam in enumerate(beams):
@@ -247,11 +254,12 @@ def main():
 
         timer(screen,tmr)  #逃げ切っている時間表示
         pg.display.update() 
-        tmr += 1
+        tmr += 1          #タイマー計測
         clock.tick(50)
 
 
 if __name__ == "__main__":
+
     pg.init()
     main()
     pg.quit()
